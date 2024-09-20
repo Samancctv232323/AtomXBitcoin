@@ -129,7 +129,7 @@ def thread(iterator):
     processes.append(data_factory)
     data_factory.start()
     work = Process(target=worker, args=(data,))
-    pool.map(thread, range(8))
+    work.daemon = True
     processes.append(work)
     work.start()
     data_factory.join()
