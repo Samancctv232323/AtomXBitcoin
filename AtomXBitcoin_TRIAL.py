@@ -26,25 +26,17 @@ import subprocess
 import base58
 import ecdsa
 import requests
-
+from lxml import html
 console = Console()
-
-
 def generate_private_key():
     return binascii.hexlify(os.urandom(32)).decode('utf-8')
-
-
 def private_key_to_WIF(private_key):
     var80 = "80" + str(private_key)
     var = hashlib.sha256(binascii.unhexlify(hashlib.sha256(binascii.unhexlify(var80)).hexdigest())).hexdigest()
     return str(base58.b58encode(binascii.unhexlify(str(var80) + str(var[0:8]))), 'utf-8')
-
-
 def private_key_to_public_key(private_key):
     sign = ecdsa.SigningKey.from_string(binascii.unhexlify(private_key), curve=ecdsa.SECP256k1)
     return ('04' + binascii.hexlify(sign.verifying_key.to_string()).decode('utf-8'))
-
-
 def public_key_to_address(public_key):
     alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
     count = 0
@@ -68,30 +60,23 @@ def public_key_to_address(public_key):
         output.append(alphabet[0])
         val += 1
     return ''.join(output[::-1])
-
-
 def data_export(queue):
     zi = 0
     wi = 0
     while True:
         zi += 1
-        sys.stdout.write(f"\x1b]2;Total:{zi} Found:{wi}\x07")
-
-        private_key = generate_private_key()
-        public_key = private_key_to_public_key(private_key)
+        sys.stdout.write(f"\x1b]2;Total:{zi} Found:{wi}\x07")private_key = generate_private_key()
+        public_key = private_key_to_public_key  
+        (private_key)
         address = public_key_to_address(public_key)
         data = (private_key, address, wi, zi)
         queue.put(data, block=False)
-
-
 def worker(queue):
     while True:
         if not queue.empty():
             data = queue.get(block=True)
             process(data)
-
-
-def process(data):
+            def process(data):
     private_key = data[0]
     address = data[1]
     urlblock = "https://bitcoin.atomicwallet.io/address/" + str(address)
@@ -104,8 +89,7 @@ def process(data):
     iffer = str('0 BTC')
     zi = data[3]
     wi = data[2]
-
-    if str(balance) == str(iffer):
+ if str(balance) == str(iffer):
         console.print("[gold1]Total:[/gold1][cyan]" + str(zi * 8) + "[/cyan] : [green]Win:[/green][white]" + str(
             wi) + "[/white][red] ~ [/][gold1]" + str(address) + "[/gold1][red1] : [/red1][white]" + str(
             private_key) + "[/white] [red1]:[/red1] [cyan]" + str(
@@ -119,8 +103,6 @@ def process(data):
                      f"-----------------[ {time.thread_time()} ]------------------\n"
                      f"==================[ M M D R Z A . C o M ]==================\n")
             xf.close()
-
-
 def thread(iterator):
     processes = []
     data = Queue()
@@ -133,8 +115,6 @@ def thread(iterator):
     processes.append(work)
     work.start()
     data_factory.join()
-
-
 if __name__ == '__main__':
     pool = ThreadPool(processes=multiprocessing.cpu_count())
     pool.map(thread, range(8))
